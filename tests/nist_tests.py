@@ -4,7 +4,7 @@ import nistrng
 
 class NIST_tester:
 
-    def __init__(self, generator):
+    def __init__(self):
         self.setup_pass_counts()
 
     def setup_pass_counts(self):

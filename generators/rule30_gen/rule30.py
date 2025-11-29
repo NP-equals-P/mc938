@@ -11,6 +11,7 @@ class Rule30Generator(AbstractGenerator):
 
     def generate_bytes(self, num_bytes):
         num = bin(self.rng.getrandbits(8*num_bytes))[2:]
+        num = self.tab_byte_chain(num, num_bytes)
         num_arr = array([
             int(b) for b in num
         ])
