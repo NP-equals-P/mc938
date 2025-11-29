@@ -2,6 +2,26 @@ from . import BATTERY, AbstractGenerator
 
 import nistrng
 
+class NIST_results:
+
+    def __init__(self, results, eligible):
+        self.passed = dict()
+        self.mean_score = dict()
+        self.eligible_count = dict()
+        for test_name, res in results.items():
+            self.passed[test_name] = res["passed"]
+            self.mean_score[test_name] = res["mean_score"]
+            self.eligible_count[test_name] = eligible[test_name]
+        
+    def get_pass_count(self):
+        return self.passed
+    
+    def get_mean_score(self):
+        return self.mean_score
+    
+    def get_eligible_count(self):
+        return self.eligible_count
+
 class NIST_tester:
 
     def __init__(self):
@@ -64,5 +84,5 @@ class NIST_tester:
             if eligible_count[test] > 0:
                 self.stat_results[test]['mean_score'] /= \
                     eligible_count[test]
-        return self.stat_results
+        return NIST_results(self.stat_results, eligible_count)
         

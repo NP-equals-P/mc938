@@ -1,0 +1,29 @@
+[33mcommit 0d4c743c191de77ec74de196d484a7140550f0dd[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: LuizFC-testes <luiz_entt@outlook.com>
+Date:   Sat Nov 29 20:31:35 2025 -0300
+
+    Gerador G1 funcionando
+
+[33mcommit d339b1cca15d6ca3801f828abe4a948232571407[m
+Author: LuizFC-testes <luiz_entt@outlook.com>
+Date:   Sat Nov 29 20:01:20 2025 -0300
+
+    Testador funcionando
+
+[33mcommit 144e4f4773e3c751dc7e65bf1f88ecbdbd915b6c[m
+Author: LuizFC-testes <luiz_entt@outlook.com>
+Date:   Sat Nov 29 18:57:22 2025 -0300
+
+    Consertado: Gerador Rule-30 não gerava número exato de bits pedido
+
+[33mcommit 1fec26c3242033a7c48dd8c349d12324951f6eab[m
+Author: LuizFC-testes <luiz_entt@outlook.com>
+Date:   Sat Nov 29 18:37:00 2025 -0300
+
+    Gerador JSONRPC adicionado
+
+[33mcommit e66ef944fff380ab5c338a407eca24dc9d3f74e9[m
+Author: LuizFC-testes <luiz_entt@outlook.com>
+Date:   Sat Nov 29 17:13:47 2025 -0300
+
+    Gerador Rule-30 ok
