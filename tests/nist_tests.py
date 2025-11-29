@@ -15,6 +15,10 @@ class NIST_tester:
 
     def set_report(self):
         self.tests = BATTERY.keys()
+
+        self.test_keys_by_val = dict()
+        for name, test in BATTERY.items():
+            self.test_keys_by_val[test.name] = name
         self.stat_results = {
             test_name: {
                 'passed': 0,
@@ -26,7 +30,7 @@ class NIST_tester:
     def run_battery_tests(self, bits):
         outs = nistrng.run_all_battery(bits, BATTERY)
         results = [
-            o[0] for o in outs
+            o[0] if o is not None else o for o in outs
         ]
         return results
 
@@ -37,15 +41,28 @@ class NIST_tester:
             num_bytes=128
     ):
         self.set_report()
+        eligible_count = {
+            test_name: 0
+            for test_name in self.tests
+        }
+        test_names = self.tests
+
         for _ in range(num_times):
             bits = gen.generate_bytes(num_bytes)
             result = self.run_battery_tests(bits)
-            for test_name in self.tests:
-                self.stat_results[test_name]['mean_score'] += \
-                    result[test_name]['score']
-                self.stat_results[test_name]['passed'] += \
-                    result[test_name]['passed']
-        for test_name in self.tests:
-            self.stat_results[test_name]['mean_score'] /= num_times
+            for i in range(len(self.tests)):
+                res = result[i]
+                if res is not None:
+                    test_name = self.test_keys_by_val[res.name]
+                    eligible_count[test_name] += 1
+                    self.stat_results[test_name]['mean_score'] += \
+                        res.score
+                    self.stat_results[test_name]['passed'] += \
+                        res.passed
+                    
+        for test in test_names:
+            if eligible_count[test] > 0:
+                self.stat_results[test]['mean_score'] /= \
+                    eligible_count[test]
         return self.stat_results
         
