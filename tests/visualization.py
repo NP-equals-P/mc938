@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
+from math import ceil
+
 class TestVisualizer:
 
     def __init__(self, results=None):
@@ -108,15 +110,20 @@ class TestVisualizer:
             ax.bar_label(rects, padding=3)
             multiplier += 1
 
+        leg_lines = ceil(len(names)/3)
+        extra_yticks = 20 * leg_lines
+        leg_box_h = 0.102 * leg_lines
+
+
         ax.set_title(label=title)
         legend = ax.legend(
             ncols=3, fancybox=True, shadow=True,
-            bbox_to_anchor=(0., 1.02, 1., .102), loc='lower left',
+            bbox_to_anchor=(0., 0.995 - leg_box_h, 1., leg_box_h), loc='lower left',
             mode="expand", borderaxespad=0.
         ) #FIXME Puxar caixa de legendas para baixo do gráfico
 
         form_tests = [self._format_xtick_label(t) for t in tests]
-        ax.set_ylim(top=total_tests + 20)
+        ax.set_ylim(top=total_tests + extra_yticks)
         ax.set_xticks(x + (len(names) - 1)*width*0.5, form_tests, rotation=90)
 
         fig.savefig(os.path.join("results", f"{stat}_comparison.png"))
