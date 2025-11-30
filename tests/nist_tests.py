@@ -4,7 +4,8 @@ import nistrng
 
 class NIST_results:
 
-    def __init__(self, results, eligible):
+    def __init__(self, name, results, eligible):
+        self.name = name
         self.passed = dict()
         self.mean_score = dict()
         self.eligible_count = dict()
@@ -84,5 +85,5 @@ class NIST_tester:
             if eligible_count[test] > 0:
                 self.stat_results[test]['mean_score'] /= \
                     eligible_count[test]
-        return NIST_results(self.stat_results, eligible_count)
+        return NIST_results(type(gen).__name__, self.stat_results, eligible_count)
         
