@@ -1,6 +1,8 @@
-from . import BATTERY, AbstractGenerator
+from . import BATTERY, AbstractGenerator, results_folder
 
 import nistrng
+import pickle as pck
+import os
 
 class NIST_results:
 
@@ -88,5 +90,8 @@ class NIST_tester:
             if eligible_count[test] > 0:
                 self.stat_results[test]['mean_score'] /= \
                     eligible_count[test]
-        return NIST_results(type(gen).__name__, self.stat_results, eligible_count)
+        results = NIST_results(type(gen).__name__, self.stat_results, eligible_count)
+        with open(os.path.join(results_folder, f"{results.get_name()}_stat_test.pck"), 'wb') as f:
+            pck.dump(results, f)
+        return results
         
