@@ -58,6 +58,23 @@ class TestVisualizer:
             ordered_stats.append(stats[test])
         return ordered_stats
     
+    def _format_xtick_label(self, label, line_ch_lim=10):
+        label_words = " ".join(label.split("_")).title().split(" ")
+        cum_len = 0
+        form_lbl_words = []
+        for word in label_words:
+            form_lbl_words.append(word)
+            cum_len += len(word)
+            if cum_len > line_ch_lim:
+                form_lbl_words.append("\n")
+                cum_len = 0
+            else:
+                form_lbl_words.append(" ")
+        if form_lbl_words[-1] == "\n":
+            form_lbl_words.pop()
+        return "".join(form_lbl_words)
+
+    
     def show_compared_stats(
             self, 
             stat="passed",
@@ -98,8 +115,9 @@ class TestVisualizer:
             mode="expand", borderaxespad=0.
         ) #FIXME Puxar caixa de legendas para baixo do gráfico
 
-        ax.set_ylim(top=total_tests + 10)
-        ax.set_xticks(x + (len(names) - 1)*width*0.5, tests, rotation=90)
+        form_tests = [self._format_xtick_label(t) for t in tests]
+        ax.set_ylim(top=total_tests + 20)
+        ax.set_xticks(x + (len(names) - 1)*width*0.5, form_tests, rotation=90)
 
         fig.savefig(os.path.join("results", f"{stat}_comparison.png"))
 
