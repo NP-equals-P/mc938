@@ -22,6 +22,9 @@ class NIST_results:
     
     def get_eligible_count(self):
         return self.eligible_count
+    
+    def get_name(self):
+        return self.name
 
 class NIST_tester:
 
