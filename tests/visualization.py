@@ -98,7 +98,7 @@ class TestVisualizer:
 
         tests = list(BATTERY.keys())
         fig, ax = plt.subplots(layout="constrained")
-        width = 0.25
+        width = 0.3
         xtick_dist = width * (len(names) + 1)
         x = np.arange(len(tests)) * xtick_dist
         multiplier = 0
