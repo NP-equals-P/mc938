@@ -1,0 +1,111 @@
+from .nist_tests import NIST_results
+from . import BATTERY
+
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+import os
+
+class TestVisualizer:
+
+    def __init__(self, results=None):
+        super().__init__()
+        self.results = dict()
+        self.add_results(results)
+
+    def add_results(self, results):
+        if isinstance(results, dict):
+            self.results = results
+        elif isinstance(results, NIST_results):
+            self.results[results.get_name()] = results
+        elif isinstance(results, list):
+            for res in results:
+                self.results[res.get_name()] = res
+    
+    def remove_results(self, name):
+        del self.results[name]
+
+    def _get_grouped_stats(self):
+        names = []
+        passed = []
+        scores = []
+        eligible = []
+        for name, result in self.results.items():
+            names.append(name)
+            passed.append(result.get_pass_count())
+            scores.append(result.get_mean_score())
+            eligible.append(result.get_eligible_count())
+        return names, passed, scores, eligible
+    
+    def _get_stat_per_test(self, stat_list, test_name):
+        test_stats = [
+            stats[test_name] for stats in stat_list
+        ]
+        return test_stats
+    
+    def _get_all_test_stats(self, stat_list):
+        stats_per_tests = {
+            test_name: [] for test_name in BATTERY.keys()
+        }
+        for stats in stat_list:
+            for test_name, stat in stats.items():
+                stats_per_tests[test_name].append(stat)
+        return stats_per_tests
+    
+    def _get_ordered_test_stats(self, stats:NIST_results, test_seq):
+        ordered_stats = []
+        for test in test_seq:
+            ordered_stats.append(stats[test])
+        return ordered_stats
+    
+    def show_compared_stats(
+            self, 
+            stat="passed",
+            total_tests=100
+    ):
+        names, passed, scores, eligible = self._get_grouped_stats()
+
+        match stat:
+            case "passed":
+                stats = passed
+                title = "Times passed on each test"
+            case "scores":
+                stats = scores
+                title = "Average P1 Score"
+            case "eligibility":
+                stats = eligible
+                title = "Eligibility for the tests"
+        
+
+        tests = list(BATTERY.keys())
+        fig, ax = plt.subplots(layout="constrained")
+        width = 0.25
+        xtick_dist = width * (len(names) + 1)
+        x = np.arange(len(tests)) * xtick_dist
+        multiplier = 0
+
+        for i in range(len(names)):
+            offset = multiplier * width
+            y = self._get_ordered_test_stats(stats[i], tests)
+            rects = ax.bar(x + offset, y, width, label=names[i])
+            ax.bar_label(rects, padding=3)
+            multiplier += 1
+
+        ax.set_title(label=title)
+        legend = ax.legend(
+            ncols=3, fancybox=True, shadow=True,
+            bbox_to_anchor=(0., 1.02, 1., .102), loc='lower left',
+            mode="expand", borderaxespad=0.
+        ) #FIXME Puxar caixa de legendas para baixo do gráfico
+
+        ax.set_ylim(top=total_tests + 10)
+        ax.set_xticks(x + (len(names) - 1)*width*0.5, tests, rotation=90)
+
+        fig.savefig(os.path.join("results", f"{stat}_comparison.png"))
+
+
+
+
+    
+
+    
