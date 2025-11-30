@@ -1,5 +1,5 @@
 from .nist_tests import NIST_results
-from . import BATTERY
+from . import BATTERY, results_folder
 
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -126,7 +126,7 @@ class TestVisualizer:
         ax.set_ylim(top=total_tests + extra_yticks)
         ax.set_xticks(x + (len(names) - 1)*width*0.5, form_tests, rotation=90)
 
-        fig.savefig(os.path.join("results", f"{stat}_comparison.png"))
+        fig.savefig(os.path.join(results_folder, f"{stat}_comparison.png"))
 
 
 
