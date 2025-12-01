@@ -97,7 +97,9 @@ class TestVisualizer:
 
         tests = list(BATTERY.keys())
         fig, ax = plt.subplots(layout="constrained")
-        width = 0.5
+        width = 0.4
+        fig_width = width*(len(names)*len(tests))
+        fig.set_figwidth(fig_width)
         xtick_dist = width * (len(names) + 1)
         x = np.arange(len(tests)) * xtick_dist
         multiplier = 0
@@ -106,6 +108,8 @@ class TestVisualizer:
         for i in range(len(names)):
             offset = multiplier * width
             y = self._get_ordered_test_stats(stats[i], tests)
+            if stat == "scores":
+                y = np.round(y, decimals=2)
             rects = ax.bar(x + offset, y, width, label=names[i])
             ax.bar_label(rects, padding=3)
             multiplier += 1
@@ -125,6 +129,7 @@ class TestVisualizer:
 
         form_tests = [self._format_xtick_label(t) for t in tests]
         ax.set_ylim(top=y_max + extra_yticks)
+        ax.set_xlim(left=-width, right=float((x+offset)[-1])+width)
         ax.set_xticks(x + (len(names) - 1)*width*0.5, form_tests, rotation=90)
 
         fig.savefig(os.path.join(results_folder, f"{stat}_comparison.png"))
