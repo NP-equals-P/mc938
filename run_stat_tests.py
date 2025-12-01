@@ -33,6 +33,6 @@ def __main__():
     nist_results = get_nist_res(tester, tested_generators)
     visualizer = TestVisualizer(nist_results)
     for test in ["passed", "scores", "eligibility"]:
-        visualizer.show_compared_stats(test)
+        visualizer.show_compared_stats(test, True)
 
 __main__()

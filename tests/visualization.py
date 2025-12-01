@@ -79,7 +79,8 @@ class TestVisualizer:
     
     def show_compared_stats(
             self, 
-            stat="passed"
+            stat="passed",
+            hide_non_eligible=False
     ):
         names, passed, scores, eligible = self._get_grouped_stats()
 
@@ -98,16 +99,25 @@ class TestVisualizer:
         tests = list(BATTERY.keys())
         fig, ax = plt.subplots(layout="constrained")
         width = 0.4
-        fig_width = width*(len(names)*len(tests))
-        fig.set_figwidth(fig_width)
         xtick_dist = width * (len(names) + 1)
-        x = np.arange(len(tests)) * xtick_dist
+
+        show_filter = [True for _ in tests]
+        if hide_non_eligible:
+            show_filter = np.array(
+                [
+                    [gen[test] for gen in eligible]
+                    for test in tests
+                ]
+            ).max(axis=1) > 0
+        filtered_tests = np.array(tests)[show_filter]
+
+        x = np.arange(len(filtered_tests)) * xtick_dist
         multiplier = 0
         y_max = 0.0
 
         for i in range(len(names)):
             offset = multiplier * width
-            y = self._get_ordered_test_stats(stats[i], tests)
+            y = self._get_ordered_test_stats(stats[i], filtered_tests)
             if stat == "scores":
                 y = np.round(y, decimals=2)
             rects = ax.bar(x + offset, y, width, label=names[i])
@@ -127,7 +137,9 @@ class TestVisualizer:
             mode="expand", borderaxespad=0.
         ) #FIXME Puxar caixa de legendas para baixo do gráfico
 
-        form_tests = [self._format_xtick_label(t) for t in tests]
+        form_tests = [self._format_xtick_label(t) for t in filtered_tests]
+        fig_width = width*(len(names)*len(filtered_tests))
+        fig.set_figwidth(fig_width)
         ax.set_ylim(top=y_max + extra_yticks)
         ax.set_xlim(left=-width, right=float((x+offset)[-1])+width)
         ax.set_xticks(x + (len(names) - 1)*width*0.5, form_tests, rotation=90)
