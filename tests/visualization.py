@@ -79,8 +79,7 @@ class TestVisualizer:
     
     def show_compared_stats(
             self, 
-            stat="passed",
-            total_tests=100
+            stat="passed"
     ):
         names, passed, scores, eligible = self._get_grouped_stats()
 
@@ -98,10 +97,11 @@ class TestVisualizer:
 
         tests = list(BATTERY.keys())
         fig, ax = plt.subplots(layout="constrained")
-        width = 0.3
+        width = 0.5
         xtick_dist = width * (len(names) + 1)
         x = np.arange(len(tests)) * xtick_dist
         multiplier = 0
+        y_max = 0.0
 
         for i in range(len(names)):
             offset = multiplier * width
@@ -109,9 +109,10 @@ class TestVisualizer:
             rects = ax.bar(x + offset, y, width, label=names[i])
             ax.bar_label(rects, padding=3)
             multiplier += 1
+            y_max = max(y_max, float(np.array(y).max()))
 
         leg_lines = ceil(len(names)/3)
-        extra_yticks = 20 * leg_lines
+        extra_yticks = 0.3 * y_max * leg_lines
         leg_box_h = 0.102 * leg_lines
 
 
@@ -123,7 +124,7 @@ class TestVisualizer:
         ) #FIXME Puxar caixa de legendas para baixo do gráfico
 
         form_tests = [self._format_xtick_label(t) for t in tests]
-        ax.set_ylim(top=total_tests + extra_yticks)
+        ax.set_ylim(top=y_max + extra_yticks)
         ax.set_xticks(x + (len(names) - 1)*width*0.5, form_tests, rotation=90)
 
         fig.savefig(os.path.join(results_folder, f"{stat}_comparison.png"))

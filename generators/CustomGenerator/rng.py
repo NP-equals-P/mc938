@@ -19,7 +19,9 @@ class g1RandomNumberGenerator(AbstractGenerator):
         super().__init__()
 
     def generate_bytes(self, num_bytes):
-        url = pickNewsPage()
-        text = getTextFromG1(url)
+        text = ""
+        while text == "":
+            url = pickNewsPage()
+            text = getTextFromG1(url)
         byteChain = getByteChain(text, num_bytes)
         return self.convert_str_to_array(byteChain)
