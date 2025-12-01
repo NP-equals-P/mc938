@@ -1,8 +1,8 @@
-# from . import AbstractGenerator
+from . import AbstractGenerator
 import numpy as np
 import hashlib
 
-class GolPRNGenerator():
+class GolPRNGenerator(AbstractGenerator):
     def __init__(self, initial_state, steps):
         super().__init__()
         self.state = initial_state
