@@ -3,6 +3,7 @@ from . import BATTERY, AbstractGenerator, results_folder
 import nistrng
 import pickle as pck
 import os
+import numpy as np
 
 class NIST_results:
 
@@ -11,16 +12,17 @@ class NIST_results:
         self.passed = dict()
         self.mean_score = dict()
         self.eligible_count = dict()
+        self.scores = dict()
         for test_name, res in results.items():
             self.passed[test_name] = res["passed"]
-            self.mean_score[test_name] = res["mean_score"]
             self.eligible_count[test_name] = eligible[test_name]
+            self.scores[test_name] = res["scores"]
         
     def get_pass_count(self):
         return self.passed
     
-    def get_mean_score(self):
-        return self.mean_score
+    def get_scores(self):
+        return self.scores
     
     def get_eligible_count(self):
         return self.eligible_count
@@ -48,7 +50,7 @@ class NIST_tester:
         self.stat_results = {
             test_name: {
                 'passed': 0,
-                'mean_score': 0
+                'scores': np.array([])
             }
             for test_name in self.tests
         }
@@ -64,7 +66,8 @@ class NIST_tester:
             self, 
             gen:AbstractGenerator, 
             num_times=100,
-            num_bytes=128
+            num_bytes=128,
+            write_mode = 'w'
     ):
         self.set_report()
         eligible_count = {
@@ -72,25 +75,37 @@ class NIST_tester:
             for test_name in self.tests
         }
         test_names = self.tests
+        gen_name = type(gen).__name__
 
-        for _ in range(num_times):
-            bits = gen.generate_bytes(num_bytes)
-            result = self.run_battery_tests(bits)
-            for i in range(len(self.tests)):
-                res = result[i]
-                if res is not None:
-                    test_name = self.test_keys_by_val[res.name]
-                    eligible_count[test_name] += 1
-                    self.stat_results[test_name]['mean_score'] += \
-                        res.score
-                    self.stat_results[test_name]['passed'] += \
-                        res.passed
+        keys_path = os.path.join(results_folder, f"{gen_name}_keys.csv")
+        with open(keys_path, write_mode) as f:
+            for _ in range(num_times):
+                bits = gen.generate_bytes(num_bytes)
+                f.write(f"{"".join(bits.astype(str))}\n")
+                result = self.run_battery_tests(bits)
+                for i in range(len(self.tests)):
+                    res = result[i]
+                    if res is not None:
+                        test_name = self.test_keys_by_val[res.name]
+                        eligible_count[test_name] += 1
+                        self.stat_results[test_name]['passed'] += \
+                            res.passed
+                        self.stat_results[test_name]['scores'] = \
+                            np.append(
+                                self.stat_results[test_name]['scores'],
+                                res.score
+                            )
                     
-        for test in test_names:
-            if eligible_count[test] > 0:
-                self.stat_results[test]['mean_score'] /= \
-                    eligible_count[test]
-        results = NIST_results(type(gen).__name__, self.stat_results, eligible_count)
+        scores_path = os.path.join(results_folder, f"{gen_name}_scores.csv")
+        with open(scores_path, write_mode) as f:
+            for test_name in test_names:
+                if eligible_count[test_name] > 0:
+                    f.write(f"{test_name}")
+                    for score in self.stat_results[test_name]['scores']:
+                        f.write(f", {score}")
+                    f.write("\n")
+        
+        results = NIST_results(gen_name, self.stat_results, eligible_count)
         with open(os.path.join(results_folder, f"{results.get_name()}_stat_test.pck"), 'wb') as f:
             pck.dump(results, f)
         return results
