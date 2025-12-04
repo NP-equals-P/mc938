@@ -33,7 +33,6 @@ class TestVisualizer:
     def _get_grouped_pass_stats(self):
         names = []
         passed = []
-        scores = []
         eligible = []
         for name, result in self.results.items():
             names.append(name)
@@ -257,6 +256,32 @@ class TestVisualizer:
 
         fig.savefig(os.path.join(results_folder, f"{filename}.png"))
 
+    def show_uniformity_cmap(self, eligible):
+
+        show_filter = self._get_show_filter(BATTERY.keys(), eligible, True)
+        filtered_tests = np.array(list(BATTERY.keys()))[show_filter]
+        gen_names = list(self.results.keys())
+
+        hm_data = [
+            [0.9 if self.results[gen].get_unif_eval()[t] else 0.1 for gen in gen_names]
+            for t in filtered_tests
+        ]
+
+        fig, ax = plt.subplots()
+        im = ax.imshow(hm_data, cmap="RdYlGn")
+        ax.set_xticks(
+            range(len(gen_names)), labels=gen_names, rotation=90,
+            #rotation_mode="anchor"
+        )
+        ax.set_yticks(
+            range(len(filtered_tests)), labels=filtered_tests
+        )
+
+        ax.set_title("P-value Uniformity Report")
+
+        plt.savefig(os.path.join(results_folder, "uniformity_report.png"))
+
+
     def show_compared_stats(
             self, 
             hide_non_eligible=False,
@@ -270,6 +295,7 @@ class TestVisualizer:
                 hide_non_eligible, num_leg_cols
             )
         
+        self.show_uniformity_cmap(eligible)
 
 
 
