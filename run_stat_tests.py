@@ -4,6 +4,7 @@ import pickle as pck
 from generators.CustomGenerator.rng import g1RandomNumberGenerator
 from generators.rule30_gen.rule30 import Rule30Generator
 from generators.json_rpc.json_rpc_gen import JSONRPCGenerator
+from generators.gol_prng.gol_prng import GolPRNGenerator
 
 from tests import results_folder
 from tests.visualization import TestVisualizer
@@ -26,13 +27,13 @@ def __main__():
     tested_generators = [
         g1RandomNumberGenerator(),
         Rule30Generator(),
-        JSONRPCGenerator()
+        JSONRPCGenerator(),
+        GolPRNGenerator(831321112, steps=5)
     ]
 
     tester = NIST_tester()
-    nist_results = get_nist_res(tester, tested_generators)
+    nist_results = get_nist_res(tester, tested_generators, overwrite=False)
     visualizer = TestVisualizer(nist_results)
-    for test in ["passed", "scores", "eligibility"]:
-        visualizer.show_compared_stats(test, True)
+    visualizer.show_compared_stats(True)
 
 __main__()

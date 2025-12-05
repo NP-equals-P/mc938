@@ -285,7 +285,7 @@ class TestVisualizer:
     def show_compared_stats(
             self, 
             hide_non_eligible=False,
-            num_leg_cols=4
+            num_leg_cols=5
     ):
         tests = list(BATTERY.keys())
         gens, passed, eligible = self._get_grouped_pass_stats()

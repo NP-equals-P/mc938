@@ -23,7 +23,7 @@ def chi_squared(distr:np.array, bin_size=0.1):
         f"Warning: bin size of {bin_size} does \
             not generate an integer number of bins"
     num_bins = int(num_bins)
-    q = distr.shape[0]/10
+    q = int(distr.shape[0])/10
     freqs = np.zeros(shape=(num_bins,))
     last_count = 0
     for i in range(len(freqs)):
